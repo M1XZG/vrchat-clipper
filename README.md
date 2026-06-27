@@ -106,11 +106,18 @@ vrchat-clipper sends countdown messages to UDP port `9000` at OSC address `/chat
 
 ### 5. Install the OVR Toolkit Custom App
 
-The wrist button lives in `ovr-custom-app/`. Follow the instructions in [ovr-custom-app/README.md](ovr-custom-app/README.md), then point it at the local server endpoint:
+The wrist button lives in `ovr-custom-app/`. Copy that folder into
+`%OVRToolkitInstallDir%/LocalCustomApps/VRChatClipper/` and follow
+[ovr-custom-app/README.md](ovr-custom-app/README.md).
+
+OVR Toolkit custom apps only load `http(s)://` URLs (not local `file://` paths), so the
+button UI is served by the clipper server itself. The custom app's `entry.txt` points at:
 
 ```text
-http://127.0.0.1:8765/api/clip
+http://127.0.0.1:8765/ovr
 ```
+
+Start the clipper server first, then restart OVR Toolkit so it loads the tile.
 
 ## Configuration reference
 
@@ -169,6 +176,14 @@ This gives you a small margin at both ends, which is useful when trimming for so
 - Open <http://127.0.0.1:8765/> on the same PC.
 - If you changed `server.port`, use the new port.
 - Check whether another app is already using the port.
+
+### The OVR Toolkit tile shows "file cannot be accessed" / "file not found"
+
+- OVR Toolkit only loads `http(s)://` URLs. `entry.txt` must contain
+  `http://127.0.0.1:8765/ovr`, **not** a local file name or `file://` path.
+- The clipper server must be running so that URL is live — open
+  <http://127.0.0.1:8765/ovr> in a browser to confirm you see the button.
+- Restart OVR Toolkit after editing `entry.txt` (it is read once at startup).
 
 ### The OVR Toolkit button does nothing
 

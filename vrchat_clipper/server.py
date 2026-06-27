@@ -51,6 +51,19 @@ def create_app() -> FastAPI:
             "<p>The web UI has not been built yet.</p></body></html>"
         )
 
+    @app.get("/ovr", response_model=None)
+    async def ovr_app() -> FileResponse | HTMLResponse:
+        # OVR Toolkit custom apps only load http(s) URLs (file:// is unsupported),
+        # so the wrist button UI is served here. Point the custom app's entry.txt
+        # at http://127.0.0.1:8765/ovr.
+        ovr_index = Path(__file__).resolve().parents[1] / "ovr-custom-app" / "index.html"
+        if ovr_index.exists():
+            return FileResponse(ovr_index)
+        return HTMLResponse(
+            "<!doctype html><html><body><h1>VRChat Clipper</h1>"
+            "<p>ovr-custom-app/index.html was not found.</p></body></html>"
+        )
+
     @app.get("/api/config")
     async def get_config() -> dict[str, Any]:
         return load_config()
@@ -92,4 +105,12 @@ def run() -> None:
 
     cfg = load_config()
     server_cfg = cfg["server"]
-    uvicorn.run(create_app(), host=server_cfg["host"], port=server_cfg["port"])
+    # access_log=False suppresses uvicorn's per-request log lines. The web UI
+    # polls /api/status every 500ms, which would otherwise flood the console;
+    # startup messages, warnings and errors are still shown.
+    uvicorn.run(
+        create_app(),
+        host=server_cfg["host"],
+        port=server_cfg["port"],
+        access_log=False,
+    )
