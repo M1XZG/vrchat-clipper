@@ -43,7 +43,32 @@
       touch-action: manipulation;
     }
     button:active { transform: scale(0.98); }
-    button:disabled { opacity: 0.65; }
+    button:disabled { opacity: 0.5; cursor: default; }
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: stretch;
+    }
+    .controls > #clipButton { flex: 1.7; }
+    .freecol {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+    .freecol button {
+      min-height: 69px;
+      border-radius: 24px;
+      font-size: 1.35rem;
+    }
+    #startButton {
+      background: linear-gradient(145deg, #16a34a, #22c55e);
+      box-shadow: 0 14px 32px rgba(22, 163, 74, 0.42);
+    }
+    #stopButton {
+      background: linear-gradient(145deg, #334155, #64748b);
+      box-shadow: 0 14px 32px rgba(51, 65, 85, 0.42);
+    }
     .status {
       display: grid;
       place-items: center;
@@ -74,7 +99,13 @@
 <body>
   <main>
     <h1>VRChat Clipper</h1>
-    <button id="clipButton" type="button">RECORD CLIP</button>
+    <div class="controls">
+      <button id="clipButton" type="button">RECORD CLIP</button>
+      <div class="freecol">
+        <button id="startButton" type="button">● START</button>
+        <button id="stopButton" type="button" disabled>■ STOP</button>
+      </div>
+    </div>
     <section class="status" aria-live="polite">
       <div>
         <p id="stateText" class="ready">Ready</p>
@@ -90,6 +121,8 @@
       // Change this if your clipper server uses a different host or port.
       var API_BASE = 'http://127.0.0.1:8765';
       var button = document.getElementById('clipButton');
+      var startButton = document.getElementById('startButton');
+      var stopButton = document.getElementById('stopButton');
       var stateText = document.getElementById('stateText');
       var detailText = document.getElementById('detailText');
 
@@ -110,8 +143,14 @@
 
       function updateStatus(status) {
         var state = status.state || 'idle';
-        button.disabled = Boolean(status.busy);
-        if (state === 'counting') {
+        var busy = Boolean(status.busy);
+        var free = Boolean(status.free_recording);
+        button.disabled = busy;
+        startButton.disabled = busy;
+        stopButton.disabled = !free;
+        if (free) {
+          setDisplay('● REC', status.message || 'Free recording', 'rec');
+        } else if (state === 'counting') {
           setDisplay(status.countdown == null ? 'Get ready' : String(status.countdown), status.message || 'Counting down', 'warn');
         } else if (state === 'recording') {
           setDisplay('● REC', status.message || 'Recording', 'rec');
@@ -153,6 +192,38 @@
           })
           .finally(function () {
             button.disabled = false;
+          });
+      });
+
+      startButton.addEventListener('click', function () {
+        startButton.disabled = true;
+        requestJson('/api/record/start', { method: 'POST' })
+          .then(function (result) {
+            if (result.status === 'busy') {
+              setDisplay('Busy', 'Already working', 'warn');
+            } else if (result.status === 'error') {
+              setDisplay('OBS error', result.message || 'Could not start', 'error');
+            } else {
+              setDisplay('● REC', 'Free recording', 'rec');
+            }
+          })
+          .catch(function () {
+            setDisplay('Offline', 'Cannot reach 127.0.0.1:8765', 'error');
+          });
+      });
+
+      stopButton.addEventListener('click', function () {
+        stopButton.disabled = true;
+        requestJson('/api/record/stop', { method: 'POST' })
+          .then(function (result) {
+            if (result.status === 'error') {
+              setDisplay('OBS error', result.message || 'Could not stop', 'error');
+            } else {
+              setDisplay('Saved', 'Recording saved', 'ready');
+            }
+          })
+          .catch(function () {
+            setDisplay('Offline', 'Cannot reach 127.0.0.1:8765', 'error');
           });
       });
 

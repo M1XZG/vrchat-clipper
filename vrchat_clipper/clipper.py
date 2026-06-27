@@ -24,6 +24,7 @@ class ClipperState:
     countdown: int | None = None
     last_clip: str | None = None
     busy: bool = False
+    free_recording: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -32,6 +33,7 @@ class ClipperState:
             "countdown": self.countdown,
             "last_clip": self.last_clip,
             "busy": self.busy,
+            "free_recording": self.free_recording,
         }
 
 
@@ -181,3 +183,90 @@ class Clipper:
     def _on_countdown_tick(self, n: int) -> None:
         self.state.countdown = n
         self.state.message = f"Counting: {n}"
+
+    async def _connect_obs(self, obs_cfg: dict[str, Any]) -> Any:
+        """Connect to OBS, auto-launching it first when configured."""
+
+        host = obs_cfg.get("host", "127.0.0.1")
+        port = int(obs_cfg.get("port", 4455))
+        password = str(obs_cfg.get("password", ""))
+        if obs_cfg.get("auto_launch") and not obs.is_obs_running():
+            obs.launch_obs(str(obs_cfg.get("obs_path", "")))
+            return await asyncio.to_thread(
+                obs.wait_until_connectable, host, port, password
+            )
+        return await asyncio.to_thread(
+            obs.wait_until_connectable, host, port, password, 4, 0.5
+        )
+
+    async def start_free(self, cfg: dict[str, Any]) -> dict[str, Any]:
+        """Begin an open-ended recording (no countdown, no OSC, no auto-stop)."""
+
+        # Atomic guard: no await between the check and claiming busy.
+        if self.busy or self.state.free_recording:
+            self.state.message = "already running"
+            return {"status": "busy"}
+        self.state.busy = True
+        self.state.free_recording = True
+        self.state.countdown = None
+
+        obs_cfg = cfg.get("obs", {})
+        try:
+            self.state.state = "connecting"
+            self.state.message = "Connecting to OBS"
+            client = await self._connect_obs(obs_cfg)
+            try:
+                if obs_cfg.get("switch_scene"):
+                    await asyncio.to_thread(
+                        obs.ensure_scene, client, str(obs_cfg.get("scene", ""))
+                    )
+                await asyncio.to_thread(obs.start_record, client)
+            finally:
+                # OBS keeps recording after the socket closes; stop reconnects.
+                await asyncio.to_thread(client.disconnect)
+            self.state.state = "recording"
+            self.state.message = "Recording (free)"
+            return {"status": "started"}
+        except Exception as exc:  # noqa: BLE001 - surface to UI, keep server alive
+            LOGGER.exception("Free recording failed to start")
+            self.state.state = "error"
+            self.state.message = str(exc)
+            self.state.busy = False
+            self.state.free_recording = False
+            return {"status": "error", "message": str(exc)}
+
+    async def stop_free(self, cfg: dict[str, Any]) -> dict[str, Any]:
+        """Stop an open-ended recording started with start_free."""
+
+        if not self.state.free_recording:
+            return {"status": "idle"}
+
+        obs_cfg = cfg.get("obs", {})
+        output_cfg = cfg.get("output", {})
+        try:
+            self.state.state = "saving"
+            self.state.message = "Saving recording"
+            client = await self._connect_obs(obs_cfg)
+            try:
+                output_path = await asyncio.to_thread(obs.stop_record, client)
+            finally:
+                await asyncio.to_thread(client.disconnect)
+            self.state.last_clip = output_path
+            copied_path = await asyncio.to_thread(
+                self._copy_output,
+                output_path,
+                str(output_cfg.get("copy_to_folder", "")),
+            )
+            self.state.last_clip = copied_path
+            self.state.message = "Clip saved" if copied_path else "Recording stopped"
+            self.state.state = "idle"
+            return {"status": "stopped", "last_clip": copied_path}
+        except Exception as exc:  # noqa: BLE001
+            LOGGER.exception("Free recording failed to stop")
+            self.state.state = "error"
+            self.state.message = str(exc)
+            return {"status": "error", "message": str(exc)}
+        finally:
+            self.state.free_recording = False
+            self.state.busy = False
+            self.state.countdown = None

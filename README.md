@@ -7,9 +7,13 @@ vrchat-clipper is built for quick 2 to 10 second social media clips: wave at a f
 ## Features
 
 - VR wrist-button trigger through an OVR Toolkit Custom App.
+- Three wrist buttons: **RECORD CLIP** (timed clip with countdown), plus **START** /
+  **STOP** for free-form recording of any length.
 - Local FastAPI server with a configuration Web UI at <http://127.0.0.1:8765/>.
-- `POST /api/clip` endpoint for simple local integrations.
-- In-game countdown through VRChat OSC chatbox messages.
+- `POST /api/clip` (timed clip) and `POST /api/record/start` · `POST /api/record/stop`
+  (free recording) endpoints for simple local integrations.
+- In-game countdown through VRChat OSC chatbox messages (timed clips only; free
+  recording sends no OSC).
 - OBS Studio recording control through obs-websocket v5.
 - Optional OBS auto-launch and scene switching.
 - Configurable clip length, intro buffer, tail buffer, countdown text, OBS settings, OSC settings, and output copy folder.

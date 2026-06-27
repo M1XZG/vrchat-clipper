@@ -16,6 +16,14 @@ there.
 The button calls `http://127.0.0.1:8765/api/clip`; the page polls `/api/status` for
 live feedback. Both match the default server config.
 
+## Buttons
+
+- **RECORD CLIP** — fixed-length clip with the OSC countdown (the timed workflow).
+- **START** / **STOP** — free-form recording: START begins recording immediately (no
+  countdown, no OSC) and it keeps going until you press STOP, for clips of any length.
+
+Only one mode runs at a time; buttons disable themselves while busy.
+
 ## Pin it to your wrist
 
 Once the tile loads (the red **RECORD CLIP** button):

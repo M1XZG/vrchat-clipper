@@ -87,6 +87,19 @@ def create_app() -> FastAPI:
         asyncio.create_task(_CLIPPER.run_clip(load_config()))
         return JSONResponse({"status": "started"}, status_code=202)
 
+    @app.post("/api/record/start")
+    async def post_record_start() -> JSONResponse:
+        if _CLIPPER.busy:
+            return JSONResponse({"status": "busy"})
+        result = await _CLIPPER.start_free(load_config())
+        status_code = 202 if result.get("status") == "started" else 200
+        return JSONResponse(result, status_code=status_code)
+
+    @app.post("/api/record/stop")
+    async def post_record_stop() -> JSONResponse:
+        result = await _CLIPPER.stop_free(load_config())
+        return JSONResponse(result)
+
     @app.get("/api/status")
     async def get_status() -> dict[str, Any]:
         return _CLIPPER.state.to_dict()
