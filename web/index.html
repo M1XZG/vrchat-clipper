@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VRChat Clipper</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Local clip control</p>
+        <h1>VRChat Clipper</h1>
+        <p class="tagline">Record short VRChat moments on demand, tune the countdown, and keep OBS ready.</p>
+      </div>
+      <div class="health-pill" id="health-pill" aria-live="polite">
+        <span class="status-dot muted" id="status-dot"></span>
+        <span id="status-label">Checking</span>
+      </div>
+    </header>
+
+    <section class="banner hidden" id="api-banner" role="status">Cannot reach the clipper server</section>
+
+    <main class="layout">
+      <section class="card status-card" aria-labelledby="status-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Clip trigger</p>
+            <h2 id="status-heading">Live status</h2>
+          </div>
+          <span class="state-chip" id="state-chip">Idle</span>
+        </div>
+
+        <button class="record-button" id="record-button" type="button">
+          <span class="record-icon" aria-hidden="true"></span>
+          Record test clip
+        </button>
+
+        <div class="status-grid">
+          <div class="status-tile countdown-tile">
+            <span class="tile-label">Countdown</span>
+            <strong id="countdown-value">Ready</strong>
+          </div>
+          <div class="status-tile">
+            <span class="tile-label">Message</span>
+            <strong id="message-value">Waiting for server</strong>
+          </div>
+        </div>
+
+        <div class="last-clip">
+          <span class="tile-label">Last clip</span>
+          <p id="last-clip-value">No clip yet</p>
+          <p class="folder-line" id="last-folder-value"></p>
+        </div>
+      </section>
+
+      <section class="card settings-card" aria-labelledby="settings-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Configuration</p>
+            <h2 id="settings-heading">Settings</h2>
+          </div>
+          <span class="save-status" id="save-status" aria-live="polite"></span>
+        </div>
+
+        <form id="config-form">
+          <fieldset>
+            <legend>Timing</legend>
+            <div class="field-grid four-cols">
+              <label>
+                <span>Clip length, seconds</span>
+                <input type="number" id="clip_length_s" min="0.5" max="120" step="0.1" required>
+              </label>
+              <label>
+                <span>Intro buffer, seconds</span>
+                <input type="number" id="intro_buffer_s" min="0" max="30" step="0.1" required>
+              </label>
+              <label>
+                <span>Tail buffer, seconds</span>
+                <input type="number" id="tail_buffer_s" min="0" max="30" step="0.1" required>
+              </label>
+              <label>
+                <span>Countdown, seconds</span>
+                <input type="number" id="countdown_s" min="0" max="60" step="1" required>
+              </label>
+            </div>
+            <p class="helper">Total recorded length = intro + clip + tail. With the defaults a 5s clip records about 7s (1s intro + 5s + 1s tail). The countdown is shown in-game before recording starts.</p>
+          </fieldset>
+
+          <fieldset>
+            <legend>Countdown / OSC</legend>
+            <label class="check-row">
+              <input type="checkbox" id="osc_countdown_enabled">
+              <span>Show countdown through OSC</span>
+            </label>
+            <div class="field-grid three-cols">
+              <label>
+                <span>OSC host</span>
+                <input type="text" id="osc_host" autocomplete="off" required>
+              </label>
+              <label>
+                <span>OSC port</span>
+                <input type="number" id="osc_port" min="1" max="65535" step="1" required>
+              </label>
+              <label>
+                <span>Countdown text template</span>
+                <input type="text" id="osc_countdown_template" placeholder="{n}">
+              </label>
+              <label>
+                <span>Go text</span>
+                <input type="text" id="osc_go_text" placeholder="REC">
+              </label>
+              <label>
+                <span>Done text</span>
+                <input type="text" id="osc_done_text" placeholder="Optional">
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>OBS</legend>
+            <div class="field-grid three-cols">
+              <label>
+                <span>OBS host</span>
+                <input type="text" id="obs_host" autocomplete="off" required>
+              </label>
+              <label>
+                <span>OBS WebSocket port</span>
+                <input type="number" id="obs_port" min="1" max="65535" step="1" required>
+              </label>
+              <label>
+                <span>OBS WebSocket password</span>
+                <input type="password" id="obs_password" autocomplete="current-password">
+              </label>
+              <label>
+                <span>Scene</span>
+                <input type="text" id="obs_scene" required>
+              </label>
+              <label class="check-row nested-check">
+                <input type="checkbox" id="obs_switch_scene">
+                <span>Switch to scene before recording</span>
+              </label>
+              <label class="check-row nested-check">
+                <input type="checkbox" id="obs_auto_launch">
+                <span>Launch OBS automatically</span>
+              </label>
+              <label class="wide-field">
+                <span>OBS path</span>
+                <input type="text" id="obs_obs_path" autocomplete="off">
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Server</legend>
+            <p class="helper">Server address changes need a restart, so these fields are shown for reference.</p>
+            <div class="field-grid two-cols">
+              <label>
+                <span>Server host</span>
+                <input type="text" id="server_host" readonly>
+              </label>
+              <label>
+                <span>Server port</span>
+                <input type="number" id="server_port" min="1" max="65535" step="1" readonly>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Output</legend>
+            <div class="field-grid">
+              <label class="wide-field">
+                <span>Copy clips to folder</span>
+                <input type="text" id="output_copy_to_folder" placeholder="Leave blank to keep the OBS default" autocomplete="off">
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="form-actions">
+            <button class="save-button" type="submit">Save settings</button>
+            <span class="form-note">Settings are saved by the local clipper server.</span>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+  <script src="/static/app.js" onerror="var s=document.createElement('script');s.src='app.js';document.body.appendChild(s);"></script>
+</body>
+</html>

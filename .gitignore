@@ -1,0 +1,26 @@
+# Python virtual environments
+venv/
+.venv/
+
+# Python cache and build artefacts
+__pycache__/
+*.pyc
+build/
+dist/
+*.egg-info/
+
+# Local configuration and secrets
+config.json
+
+# Recorded clips and local output
+clips/
+recordings/
+output/
+
+# Editors
+.vscode/
+.idea/
+.DS_Store
+
+# Logs
+*.log

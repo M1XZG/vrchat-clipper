@@ -1,0 +1,5 @@
+fastapi>=0.115.0              # Web API and config UI server
+uvicorn[standard]>=0.30.0     # ASGI server
+python-osc>=1.9.0             # VRChat OSC chatbox countdown
+obsws-python>=1.7.0           # OBS WebSocket v5 client
+psutil>=6.0.0                 # Detect obs64.exe for auto-launch

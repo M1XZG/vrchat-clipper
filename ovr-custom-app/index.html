@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VRChat Clipper</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #1f2937, #050816 68%);
+      color: #f8fafc;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+      user-select: none;
+    }
+    main {
+      width: min(100vw, 420px);
+      padding: 18px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 14px;
+      color: #93c5fd;
+      font-size: 1.05rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    button {
+      width: 100%;
+      min-height: 150px;
+      border: 0;
+      border-radius: 32px;
+      background: linear-gradient(145deg, #ef4444, #f97316);
+      color: white;
+      box-shadow: 0 18px 42px rgba(239, 68, 68, 0.42);
+      font: 950 2rem/1.05 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    button:active { transform: scale(0.98); }
+    button:disabled { opacity: 0.65; }
+    .status {
+      display: grid;
+      place-items: center;
+      min-height: 130px;
+      margin-top: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 28px;
+      background: rgba(15, 23, 42, 0.78);
+    }
+    #stateText {
+      margin: 0;
+      font-size: clamp(2rem, 16vw, 4.8rem);
+      font-weight: 1000;
+      line-height: 1;
+    }
+    #detailText {
+      margin: 10px 0 0;
+      color: #cbd5e1;
+      font-size: 1rem;
+      overflow-wrap: anywhere;
+    }
+    .rec { color: #fca5a5; text-shadow: 0 0 24px rgba(239, 68, 68, 0.8); }
+    .ready { color: #bbf7d0; }
+    .warn { color: #fde68a; }
+    .error { color: #fecdd3; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>VRChat Clipper</h1>
+    <button id="clipButton" type="button">RECORD CLIP</button>
+    <section class="status" aria-live="polite">
+      <div>
+        <p id="stateText" class="ready">Ready</p>
+        <p id="detailText">Waiting for a clip</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // Change this if your clipper server uses a different host or port.
+      var API_BASE = 'http://127.0.0.1:8765';
+      var button = document.getElementById('clipButton');
+      var stateText = document.getElementById('stateText');
+      var detailText = document.getElementById('detailText');
+
+      function setDisplay(text, detail, className) {
+        stateText.textContent = text;
+        stateText.className = className || '';
+        detailText.textContent = detail || '';
+      }
+
+      function requestJson(path, options) {
+        return fetch(API_BASE + path, options).then(function (response) {
+          if (!response.ok) {
+            throw new Error('Request failed');
+          }
+          return response.json();
+        });
+      }
+
+      function updateStatus(status) {
+        var state = status.state || 'idle';
+        button.disabled = Boolean(status.busy);
+        if (state === 'counting') {
+          setDisplay(status.countdown == null ? 'Get ready' : String(status.countdown), status.message || 'Counting down', 'warn');
+        } else if (state === 'recording') {
+          setDisplay('● REC', status.message || 'Recording', 'rec');
+        } else if (state === 'connecting') {
+          setDisplay('OBS', status.message || 'Connecting to OBS', 'warn');
+        } else if (state === 'saving') {
+          setDisplay('Saving', status.message || 'Saving clip', 'warn');
+        } else if (state === 'error') {
+          setDisplay('OBS error', status.message || 'Check the PC app', 'error');
+        } else {
+          setDisplay('Ready', status.message || 'Waiting for a clip', 'ready');
+        }
+      }
+
+      function pollStatus() {
+        requestJson('/api/status')
+          .then(updateStatus)
+          .catch(function () {
+            button.disabled = false;
+            setDisplay('Offline', 'Start the clipper server', 'error');
+          })
+          .finally(function () {
+            window.setTimeout(pollStatus, 500);
+          });
+      }
+
+      button.addEventListener('click', function () {
+        button.disabled = true;
+        requestJson('/api/clip', { method: 'POST' })
+          .then(function (result) {
+            if (result.status === 'busy') {
+              setDisplay('Busy', 'Clipper is already working', 'warn');
+            } else {
+              setDisplay('Started', 'Clip requested', 'warn');
+            }
+          })
+          .catch(function () {
+            setDisplay('Offline', 'Cannot reach 127.0.0.1:8765', 'error');
+          })
+          .finally(function () {
+            button.disabled = false;
+          });
+      });
+
+      pollStatus();
+    }());
+  </script>
+</body>
+</html>
