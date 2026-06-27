@@ -22,18 +22,16 @@ vrchat-clipper is built for quick 2 to 10 second social media clips: wave at a f
 ## Architecture
 
 ```text
-OVR Toolkit wrist button
-        │
-        │ POST /api/clip
-        ▼
-Python FastAPI server (python -m vrchat_clipper)
-        │
-        ├──► VRChat OSC /chatbox/input
-        │    countdown: 5, 4, 3, 2, 1, REC
-        │
-        └──► OBS WebSocket v5
-             switch scene, start recording, wait, stop recording
-             optional copy to output folder
+OVR Toolkit wrist buttons ─► Python FastAPI server (python -m vrchat_clipper)
+
+  RECORD CLIP   POST /api/clip          ─► timed clip
+                                            ├─ VRChat OSC /chatbox/input: 5, 4, 3, 2, 1, REC
+                                            └─ OBS WebSocket v5: record (intro+clip+tail), stop
+
+  START / STOP  POST /api/record/start  ─► free recording (any length, no OSC)
+                POST /api/record/stop       └─ OBS WebSocket v5: start … stop on demand
+
+  Both paths optionally switch the OBS scene and copy the finished clip to an output folder.
 ```
 
 For the full research and design background, see [docs/DESIGN.md](docs/DESIGN.md).
@@ -161,7 +159,12 @@ intro buffer       clip length             tail buffer
 
 This gives you a small margin at both ends, which is useful when trimming for social media. Increase `clip_length_s` for longer actions, or adjust the buffers if you want tighter files.
 
+Free recording (START / STOP) ignores these settings entirely — it records from the
+moment you press START until you press STOP, with no countdown or buffers.
+
 ## How it works
+
+### Timed clip — RECORD CLIP
 
 1. The OVR Toolkit Custom App sends `POST /api/clip` to the local FastAPI server.
 2. The server loads `config.json` and prevents overlapping clip jobs.
@@ -171,6 +174,18 @@ This gives you a small margin at both ends, which is useful when trimming for so
 6. The server waits for `intro_buffer_s + clip_length_s + tail_buffer_s`.
 7. OBS stops recording and returns the output path.
 8. If configured, the server copies the finished clip to `output.copy_to_folder`.
+
+### Free recording — START / STOP
+
+1. The Custom App sends `POST /api/record/start`. The server makes sure OBS is running,
+   switches scene if configured, and starts recording **immediately — no countdown and
+   no OSC output**.
+2. Recording continues for **any length** until you press STOP.
+3. `POST /api/record/stop` stops OBS, returns the output path, and copies the clip to
+   `output.copy_to_folder` if configured.
+
+Only one mode runs at a time; the server's busy guard blocks overlaps, and the wrist
+buttons disable themselves while a job is running.
 
 ## Troubleshooting
 
@@ -191,11 +206,13 @@ This gives you a small margin at both ends, which is useful when trimming for so
 
 ### The OVR Toolkit button does nothing
 
-- Confirm the Custom App is sending to `http://127.0.0.1:8765/api/clip`.
-- Test the endpoint from the same PC:
+- Confirm the Custom App page loads at <http://127.0.0.1:8765/ovr>.
+- Test the endpoints from the same PC:
 
 ```powershell
-curl -X POST http://127.0.0.1:8765/api/clip
+curl -X POST http://127.0.0.1:8765/api/clip            # timed clip
+curl -X POST http://127.0.0.1:8765/api/record/start    # begin free recording
+curl -X POST http://127.0.0.1:8765/api/record/stop     # end free recording
 ```
 
 ### OBS does not connect
