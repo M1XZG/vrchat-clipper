@@ -65,6 +65,74 @@ On Windows you can also double-click `run.bat`. On Linux or macOS development ma
 ./run.sh
 ```
 
+## Single executable (recommended for most users)
+
+Instead of installing Python, you can run a single packaged executable with a
+`config.json` beside it. This is the easiest way to install and to launch the
+recorder automatically with SteamVR.
+
+### Get the executable
+
+Download `vrchat-clipper.exe` from the project's GitHub Releases, or build it
+yourself (see [Building the executable](#building-the-executable)). Put it in a
+folder of your choice and, optionally, copy `config.example.json` next to it as
+`config.json`.
+
+### Run it
+
+Double-click `vrchat-clipper.exe`. It starts the local server, shows a
+system-tray icon, and (on first run, if SteamVR is present) registers itself with
+SteamVR for auto-launch. From the tray icon you can open the Web UI, trigger a
+clip, or quit.
+
+Useful command-line flags:
+
+| Flag | Effect |
+|---|---|
+| `--no-tray` | Run a plain foreground server with no tray icon. |
+| `--register-vr` | Register with SteamVR for auto-launch, then exit. |
+| `--unregister-vr` | Remove the SteamVR auto-launch registration, then exit. |
+| `--no-vr-register` | Start normally but do not touch SteamVR registration. |
+
+The `config.json` file lives next to the executable and stays plain, editable
+JSON. You can also point the app at a different file with the
+`VRCHAT_CLIPPER_CONFIG` environment variable.
+
+### What still needs separate setup
+
+The single executable bundles the backend and the configuration Web UI, but a few
+pieces cannot live inside it and are installed once, as before:
+
+- The **OVR Toolkit wrist button** (`ovr-custom-app/`) runs inside OVR Toolkit, so
+  it is copied into OVR Toolkit's `LocalCustomApps` folder separately. See
+  [ovr-custom-app/README.md](ovr-custom-app/README.md).
+- **OBS Studio**, the **Off-World-Live obs-spout2-plugin**, and **VRChat's** camera
+  Stream mode / Spout toggle remain one-time manual prerequisites.
+
+### Launch with SteamVR
+
+Once registered (automatically on first run, or with `--register-vr`), the
+recorder appears under **SteamVR → Settings → Startup / Shutdown → Manage Add-Ons**
+and starts whenever SteamVR starts. Toggle it there, or run `--unregister-vr` to
+remove it.
+
+### Building the executable
+
+The executable is built with [PyInstaller](https://pyinstaller.org/) from
+`vrchat-clipper.spec`. PyInstaller produces a binary for the platform it runs on,
+so a Windows `.exe` must be built on Windows.
+
+```powershell
+py -3 -m venv .venv
+.venv\Scripts\python -m pip install -r requirements.txt -r requirements-exe.txt
+.venv\Scripts\pyinstaller --clean --noconfirm vrchat-clipper.spec
+```
+
+The result is `dist\vrchat-clipper.exe`. A GitHub Actions workflow
+(`.github/workflows/build-windows.yml`) builds and smoke-tests this on a Windows
+runner and, on a version tag like `v1.2.3`, publishes it to a Release.
+
+
 ## One-time VRChat and OBS setup
 
 ### 1. Enable VRChat camera Stream mode and Spout2

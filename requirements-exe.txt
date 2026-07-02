@@ -1,0 +1,9 @@
+# Extra dependencies needed only to BUILD and RUN the packaged single-file
+# executable. The base runtime deps are in requirements.txt.
+#
+#   pip install -r requirements.txt -r requirements-exe.txt
+
+pyinstaller>=6.6.0        # Build the single-file executable
+pystray>=0.19.5           # System-tray icon for the packaged app
+Pillow>=10.0.0            # Tray icon image handling (pystray dependency)
+openvr>=1.26.701          # SteamVR app-manifest registration (auto-launch)
