@@ -14,12 +14,13 @@ from fastapi.staticfiles import StaticFiles
 from . import __version__
 from .clipper import Clipper
 from .config import load_config, merge_config, save_config
+from .paths import web_dir
 
 _CLIPPER = Clipper(config_getter=load_config)
 
 
 def _web_dir() -> Path:
-    return Path(__file__).resolve().parents[1] / "web"
+    return web_dir()
 
 
 def create_app() -> FastAPI:

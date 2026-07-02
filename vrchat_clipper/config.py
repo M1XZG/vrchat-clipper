@@ -39,7 +39,12 @@ DEFAULT: dict[str, Any] = {
 
 
 def _config_path() -> Path:
-    return Path(os.environ.get("VRCHAT_CLIPPER_CONFIG", "./config.json"))
+    override = os.environ.get("VRCHAT_CLIPPER_CONFIG")
+    if override:
+        return Path(override)
+    from .paths import app_dir
+
+    return app_dir() / "config.json"
 
 
 def default_config() -> dict[str, Any]:

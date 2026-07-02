@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vrchat-clipper"
+dynamic = ["version"]
+description = "One-button VRChat short-clip recorder: wrist button -> countdown -> OBS recording"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "M1XZG" }]
+keywords = ["vrchat", "obs", "osc", "steamvr", "clip", "recording"]
+classifiers = [
+    "Environment :: Console",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Video :: Capture",
+]
+
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "python-osc>=1.9.0",
+    "obsws-python>=1.7.0",
+    "psutil>=6.0.0",
+]
+
+[project.optional-dependencies]
+# Desktop integration used by the packaged executable: system-tray icon and
+# SteamVR auto-launch registration. Not required to run from source.
+desktop = [
+    "pystray>=0.19.5",
+    "Pillow>=10.0.0",
+    "openvr>=1.26.701",
+]
+
+[project.scripts]
+vrchat-clipper = "vrchat_clipper.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/M1XZG/vrchat-clipper"
+Repository = "https://github.com/M1XZG/vrchat-clipper"
+
+[tool.setuptools]
+packages = ["vrchat_clipper"]
+
+[tool.setuptools.dynamic]
+version = { attr = "vrchat_clipper.__version__" }
+
+[tool.setuptools.package-data]
+# Ship the web UI inside the wheel so it is found when pip-installed.
+vrchat_clipper = ["web/*"]

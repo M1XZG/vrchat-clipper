@@ -1,0 +1,139 @@
+name: Release
+
+# Publishes a GitHub Release with BOTH distribution formats when a version tag
+# like v0.2.0 is pushed:
+#
+#   * Python package  - wheel (.whl) + source dist (.tar.gz), built on Linux.
+#   * Windows binary  - single-file vrchat-clipper.exe, built on a Windows runner
+#                       (PyInstaller cannot cross-compile a Windows binary).
+#
+# Trigger it by pushing a tag:  git tag v0.2.0 && git push origin v0.2.0
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  python-dist:
+    name: Build Python wheel and sdist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build distributions
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build --outdir dist_py
+
+      - name: Verify the wheel installs and runs
+        run: |
+          python -m venv /tmp/verify
+          /tmp/verify/bin/pip install dist_py/*.whl
+          # Run from a neutral directory to prove bundled web assets resolve.
+          cd /tmp
+          /tmp/verify/bin/vrchat-clipper --no-tray &
+          SERVER_PID=$!
+          for i in $(seq 1 20); do
+            if curl -sf http://127.0.0.1:8765/api/health >/dev/null; then break; fi
+            sleep 1
+          done
+          curl -sf http://127.0.0.1:8765/api/health
+          curl -sf -o /dev/null http://127.0.0.1:8765/
+          kill "$SERVER_PID"
+
+      - name: Upload Python artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-dist
+          path: dist_py/*
+          if-no-files-found: error
+
+  windows-exe:
+    name: Build Windows executable
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-exe.txt
+
+      - name: Build executable
+        run: pyinstaller --clean --noconfirm vrchat-clipper.spec
+
+      - name: Smoke test the executable
+        shell: pwsh
+        run: |
+          $exe = "dist/vrchat-clipper.exe"
+          if (-not (Test-Path $exe)) { throw "Executable not found at $exe" }
+          $proc = Start-Process -FilePath $exe -ArgumentList "--no-tray","--no-vr-register" -PassThru
+          try {
+            $ok = $false
+            for ($i = 0; $i -lt 20; $i++) {
+              Start-Sleep -Seconds 1
+              try {
+                $r = Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8765/api/health -TimeoutSec 2
+                if ($r.StatusCode -eq 200) { $ok = $true; break }
+              } catch { }
+            }
+            if (-not $ok) { throw "Server did not become healthy in time" }
+            $idx = Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8765/ -TimeoutSec 5
+            if ($idx.StatusCode -ne 200) { throw "Index did not return 200" }
+            Write-Host "Smoke test passed: API healthy and web UI served."
+          }
+          finally {
+            if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
+          }
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-exe
+          path: dist/vrchat-clipper.exe
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub Release
+    needs: [python-dist, windows-exe]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Python artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-dist
+          path: release
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-exe
+          path: release
+
+      - name: List release files
+        run: ls -la release
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            release/vrchat-clipper.exe
+            release/*.whl
+            release/*.tar.gz

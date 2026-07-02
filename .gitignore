@@ -27,3 +27,7 @@ output/
 
 # Local session notes (not part of the project)
 .session-notes.md
+
+# Frozen-build artefacts
+app.vrmanifest
+dist_py/
