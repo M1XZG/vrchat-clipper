@@ -1,14 +1,14 @@
-"""Path resolution that works both from source and from a PyInstaller bundle.
+"""Path resolution that works from source, from a pip install, and when frozen.
 
-Two distinct locations matter once the app is frozen into a single executable:
+Three situations must all work:
 
-* Bundled, read-only resources (the ``web/`` UI) are unpacked by PyInstaller into
-  a temporary directory exposed as ``sys._MEIPASS``. Use :func:`resource_dir`.
-* User-editable state (``config.json``) must live next to the executable so it
-  survives restarts and is easy to find. Use :func:`app_dir`.
+* **From source** (``python -m vrchat_clipper`` in a checkout).
+* **Pip-installed** (the package lives under ``site-packages``).
+* **Frozen** into a single PyInstaller executable.
 
-When running from source both fall back to the repository root, so nothing about
-the normal ``python -m vrchat_clipper`` workflow changes.
+The web UI ships inside the package (``vrchat_clipper/web``) so it is found in
+all three cases. User-editable state (``config.json``) lives next to the
+executable when frozen, otherwise in the current working directory.
 """
 
 from __future__ import annotations
@@ -23,29 +23,36 @@ def _frozen() -> bool:
     return bool(getattr(sys, "frozen", False))
 
 
-def resource_dir() -> Path:
-    """Directory holding bundled read-only resources such as ``web/``."""
+def _bundle_root() -> Path:
+    """Root of the unpacked bundle when frozen."""
+
+    base = getattr(sys, "_MEIPASS", None)
+    if base:
+        return Path(base)
+    return Path(sys.executable).resolve().parent
+
+
+def web_dir() -> Path:
+    """Directory holding the bundled web UI.
+
+    Frozen builds place it at ``<bundle>/web`` (see the PyInstaller spec). From
+    source or a pip install it lives inside the package.
+    """
 
     if _frozen():
-        # PyInstaller onefile extracts data files under sys._MEIPASS. onedir
-        # builds set it to the executable's folder. Fall back to that folder.
-        base = getattr(sys, "_MEIPASS", None)
-        if base:
-            return Path(base)
-        return Path(sys.executable).resolve().parent
-    # From source, resources live at the repository root (one level above this
-    # package directory).
-    return Path(__file__).resolve().parents[1]
+        return _bundle_root() / "web"
+    return Path(__file__).resolve().parent / "web"
 
 
 def app_dir() -> Path:
-    """Directory for user-editable state that persists next to the app.
+    """Directory for user-editable state that persists between runs.
 
-    Frozen: the folder containing the executable. From source: the repository
-    root, matching the historical ``./config.json`` location when launched via
-    ``run.bat`` / ``run.sh``.
+    Frozen: the folder containing the executable, so ``config.json`` sits right
+    next to it. Otherwise: the current working directory, preserving the
+    historical ``./config.json`` location and behaving sensibly for a
+    pip-installed console script.
     """
 
     if _frozen():
         return Path(sys.executable).resolve().parent
-    return Path(__file__).resolve().parents[1]
+    return Path.cwd()

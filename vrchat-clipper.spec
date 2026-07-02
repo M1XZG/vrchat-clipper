@@ -35,9 +35,10 @@ hidden_imports = (
     ]
 )
 
-# Bundle the web UI. Path is relative to this spec file at build time.
+# Bundle the web UI (now inside the package). Path is relative to this spec
+# file at build time; it is placed at <bundle>/web to match paths.web_dir().
 datas = [
-    ("web", "web"),
+    ("vrchat_clipper/web", "web"),
 ]
 
 # openvr ships a native library (openvr_api.dll / .so / .dylib) plus data files
@@ -89,5 +90,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon="web/icon.png",
+    icon="vrchat_clipper/web/icon.png",
 )

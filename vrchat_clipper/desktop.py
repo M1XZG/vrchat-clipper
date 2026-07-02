@@ -29,7 +29,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import load_config
-from .paths import app_dir, resource_dir
+from .paths import app_dir, web_dir
 
 LOGGER = logging.getLogger(__name__)
 
@@ -174,7 +174,7 @@ def _tray_icon():  # pragma: no cover - requires a desktop session
         LOGGER.info("Tray unavailable (pystray/Pillow missing): %s", exc)
         return None
 
-    icon_path = resource_dir() / "web" / "icon.png"
+    icon_path = web_dir() / "icon.png"
     try:
         image = Image.open(icon_path)
     except Exception:

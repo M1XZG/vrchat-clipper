@@ -30,3 +30,4 @@ output/
 
 # Frozen-build artefacts
 app.vrmanifest
+dist_py/
