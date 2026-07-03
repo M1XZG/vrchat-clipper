@@ -20,7 +20,7 @@ you install the clipper itself:
   because OBS has no built-in Spout support on Windows.
 
 You configure those once after installing — see
-[One-time VRChat and OBS setup](../README.md#one-time-vrchat-and-obs-setup).
+[One-time VRChat and OBS setup](one-time-setup.md).
 
 ## Step 1 — Download the executable
 
@@ -72,7 +72,7 @@ The in-VR button is an OVR Toolkit custom app. Copy the
 OVR Toolkit's `LocalCustomApps` folder and follow
 [its README](../vrchat_clipper/ovr-custom-app/README.md). The full walk-through,
 including pinning the tile to your wrist, is in
-[Install the OVR Toolkit Custom App](../README.md#4-install-the-ovr-toolkit-custom-app).
+[Install the OVR Toolkit Custom App](one-time-setup.md#4-install-the-ovr-toolkit-custom-app).
 
 Once it's pinned, glancing at your wrist in VRChat shows the panel:
 
@@ -87,7 +87,7 @@ Once it's pinned, glancing at your wrist in VRChat shows the panel:
 
 The last pieces live inside VRChat and OBS and can't be bundled into the exe. Do
 these once and clipping is automatic after that:
-[One-time VRChat and OBS setup](../README.md#one-time-vrchat-and-obs-setup).
+[One-time VRChat and OBS setup](one-time-setup.md).
 
 ## Command-line flags
 

@@ -13,7 +13,7 @@ You only need to read this after you've installed the clipper itself — see the
 OBS can only capture VRChat's camera once VRChat is sending it out over Spout. Turn
 on the VRChat camera's Stream mode and Spout2 output first — that's a VRChat-side
 setting covered in
-[One-time VRChat and OBS setup, step 1](../README.md#one-time-vrchat-and-obs-setup).
+[One-time VRChat and OBS setup, step 1](one-time-setup.md#1-enable-vrchat-camera-stream-mode-and-spout2).
 It has to be re-enabled once per VRChat session; everything below you set up only
 once.
 
@@ -38,7 +38,7 @@ sources.
    now appears in the OBS preview.
 
 If the source stays black, VRChat isn't broadcasting — re-check the
-[VRChat camera step](../README.md#one-time-vrchat-and-obs-setup) and that the sender
+[VRChat camera step](one-time-setup.md#1-enable-vrchat-camera-stream-mode-and-spout2) and that the sender
 name is exactly `VRCSender1`.
 
 ## 3. Enable the OBS WebSocket

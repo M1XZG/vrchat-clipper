@@ -23,7 +23,7 @@ For the Python path you also need **Python 3.10 or newer**. Linux and macOS are 
 for development, but the runtime target is Windows with SteamVR.
 
 You configure the VRChat and OBS side once after installing — see
-[One-time VRChat and OBS setup](../README.md#one-time-vrchat-and-obs-setup).
+[One-time VRChat and OBS setup](one-time-setup.md).
 
 ## Option 1 — Install the wheel with pip
 
@@ -117,7 +117,7 @@ The in-VR button is an OVR Toolkit custom app. Copy the
 [`vrchat_clipper/ovr-custom-app/`](../vrchat_clipper/ovr-custom-app/) folder into
 OVR Toolkit's `LocalCustomApps` folder and follow
 [its README](../vrchat_clipper/ovr-custom-app/README.md); the full walk-through is in
-[Install the OVR Toolkit Custom App](../README.md#4-install-the-ovr-toolkit-custom-app).
+[Install the OVR Toolkit Custom App](one-time-setup.md#4-install-the-ovr-toolkit-custom-app).
 
 Once pinned, glancing at your wrist in VRChat shows the panel:
 
@@ -130,7 +130,7 @@ Once pinned, glancing at your wrist in VRChat shows the panel:
 ## One-time VRChat and OBS setup
 
 Finish by configuring the VRChat camera, OBS, and OSC once:
-[One-time VRChat and OBS setup](../README.md#one-time-vrchat-and-obs-setup).
+[One-time VRChat and OBS setup](one-time-setup.md).
 
 ## Building the release artifacts yourself
 

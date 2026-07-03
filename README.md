@@ -12,7 +12,7 @@ vrchat-clipper is built for quick 2 to 10 second social media clips: wave at a f
 - [Architecture](#architecture)
 - [Requirements](#requirements)
 - [Installation](#installation)
-- [One-time VRChat and OBS setup](#one-time-vrchat-and-obs-setup)
+- [Setup](#setup)
 - [Configuration reference](#configuration-reference)
 - [Timing model](#timing-model)
 - [How it works](#how-it-works)
@@ -25,6 +25,7 @@ vrchat-clipper is built for quick 2 to 10 second social media clips: wave at a f
 
 - [Install with the Windows executable](docs/install-windows-exe.md)
 - [Install with Python (pip or source)](docs/install-python.md)
+- [One-time VRChat and OBS setup](docs/one-time-setup.md)
 - [OBS setup](docs/obs-setup.md)
 - [OVR Toolkit wrist-button app](vrchat_clipper/ovr-custom-app/README.md)
 - [Design notes and research](docs/DESIGN.md)
@@ -90,53 +91,18 @@ one that fits you — each guide is a complete, step-by-step walk-through:
 
 Either guide takes you through installing, first run, configuring, registering with
 SteamVR, and adding the wrist button, then hands off to the shared
-[One-time VRChat and OBS setup](#one-time-vrchat-and-obs-setup) below. Whichever you
+[One-time VRChat and OBS setup](docs/one-time-setup.md). Whichever you
 choose, you also need the apps the clipper drives — see
 [Requirements](#requirements).
 
-## One-time VRChat and OBS setup
+## Setup
 
-### 1. Enable VRChat camera Stream mode and Spout2
+Once the clipper is installed, finish the one-time configuration of VRChat, OBS, and
+the OVR Toolkit wrist button. It's a separate, self-contained guide:
 
-VRChat's in-game camera Stream mode plus Spout2 output cannot be automated. VRChat does not provide an API, OSC address, or hotkey for this setting.
-
-Enable it once per VRChat session. After that, OBS can keep using a Spout2 source bound to sender name `VRCSender1`, and clipping is fully automated for the rest of the session.
-
-In short:
-
-1. Start VRChat.
-2. Open the VRChat camera.
-3. Enable Stream mode and Spout2 output.
-4. Leave VRChat running. The Spout sender should remain available even if the camera UI is closed.
-
-### 2. Set up OBS
-
-The clipper captures VRChat's camera through an OBS Spout2 source and controls
-recording over the OBS WebSocket. Both are configured once, in the
-**[OBS setup guide](docs/obs-setup.md)**: install the Off-World-Live Spout2 plugin,
-add a `Spout2 Capture` source bound to `VRCSender1`, and enable the OBS WebSocket
-server with a password you put in `config.json`.
-
-### 3. Enable VRChat OSC
-
-In VRChat, open **Action Menu > OSC > Enabled**.
-
-vrchat-clipper sends countdown messages to UDP port `9000` at OSC address `/chatbox/input` with arguments: message text, bypass keyboard, suppress sound effect.
-
-### 4. Install the OVR Toolkit Custom App
-
-The wrist button lives in `vrchat_clipper/ovr-custom-app/`. Copy that folder into
-`%OVRToolkitInstallDir%/LocalCustomApps/VRChatClipper/` and follow
-[vrchat_clipper/ovr-custom-app/README.md](vrchat_clipper/ovr-custom-app/README.md).
-
-OVR Toolkit custom apps only load `http(s)://` URLs (not local `file://` paths), so the
-button UI is served by the clipper server itself. The custom app's `entry.txt` points at:
-
-```text
-http://127.0.0.1:8765/ovr
-```
-
-Start the clipper server first, then restart OVR Toolkit so it loads the tile.
+**[One-time VRChat and OBS setup](docs/one-time-setup.md)** — enable the VRChat
+camera Spout feed and OSC, [set up OBS](docs/obs-setup.md), and install the wrist
+button. Do it once and clipping is automatic from then on.
 
 ## Configuration reference
 
