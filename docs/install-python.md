@@ -97,7 +97,8 @@ as **VRChat Clipper**:
 ![VRChat Clipper listed under SteamVR startup add-ons, toggled On](images/steamvr-startup-addons.png)
 
 Toggle it there whenever you want, or run `vrchat-clipper --unregister-vr` to remove
-the entry.
+the entry. Once launched by SteamVR, the clipper also exits automatically when
+SteamVR shuts down.
 
 ### Command-line flags
 

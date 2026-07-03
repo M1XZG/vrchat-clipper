@@ -87,6 +87,15 @@ def main() -> None:
 
         desktop.run_with_tray()
     else:
+        # A frozen build launched by SteamVR should also quit when SteamVR does,
+        # even without a tray. The watcher self-limits if SteamVR isn't running.
+        if _is_frozen():
+            try:
+                from . import desktop
+
+                desktop.watch_for_steamvr_quit(on_quit=desktop.force_exit)
+            except Exception:
+                pass
         run()
 
 

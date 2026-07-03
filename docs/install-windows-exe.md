@@ -62,8 +62,9 @@ Shutdown → Manage Add-Ons**, where it appears as **VRChat Clipper**:
 
 ![VRChat Clipper listed under SteamVR startup add-ons, toggled On](images/steamvr-startup-addons.png)
 
-Leave it **On** and the server is running any time you're in VR. To stop that,
-switch it **Off** here, or run the exe once with `--unregister-vr`.
+Leave it **On** and the server is running any time you're in VR. It also shuts down
+automatically when you exit SteamVR, so it won't linger in the background. To stop it
+launching at all, switch it **Off** here, or run the exe once with `--unregister-vr`.
 
 ## Step 5 — Add the wrist button in OVR Toolkit
 

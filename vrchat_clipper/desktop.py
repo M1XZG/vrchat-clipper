@@ -22,8 +22,10 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sys
 import threading
+import time
 import webbrowser
 from pathlib import Path
 from typing import Any
@@ -36,6 +38,11 @@ LOGGER = logging.getLogger(__name__)
 APP_KEY = "m1xzg.vrchatclipper"
 APP_NAME = "VRChat Clipper"
 APP_DESCRIPTION = "One-button VRChat short-clip recorder"
+
+# How long to keep trying to reach the OpenVR runtime before assuming the app was
+# started without SteamVR (e.g. launched manually). When SteamVR auto-launches the
+# recorder the runtime is already up, so the first attempt normally succeeds.
+QUIT_CONNECT_TIMEOUT_S = 60.0
 
 
 def _executable_path() -> Path:
@@ -145,6 +152,77 @@ def unregister_vrmanifest() -> bool:
             pass
 
 
+def watch_for_steamvr_quit(on_quit) -> "threading.Thread | None":
+    """Exit the recorder when SteamVR shuts down.
+
+    SteamVR auto-launches the recorder but never stops it, so it would otherwise
+    linger after the headset session ends. This connects to the running OpenVR
+    runtime as a *background* app and waits for the ``VREvent_Quit`` that SteamVR
+    broadcasts to registered apps when it exits, then calls ``on_quit``.
+
+    Runs in a daemon thread and returns it, or ``None`` if ``openvr`` is not
+    installed. If the runtime cannot be reached within
+    :data:`QUIT_CONNECT_TIMEOUT_S` (the app was started without SteamVR), the
+    watcher gives up quietly and leaves the server running.
+    """
+
+    try:
+        import openvr  # type: ignore
+    except Exception as exc:  # pragma: no cover - optional dep
+        LOGGER.info("openvr not available; not watching for SteamVR quit: %s", exc)
+        return None
+
+    def _loop() -> None:  # pragma: no cover - needs a live SteamVR runtime
+        vr_system = None
+        deadline = time.monotonic() + QUIT_CONNECT_TIMEOUT_S
+        while vr_system is None:
+            try:
+                vr_system = openvr.init(openvr.VRApplication_Background)
+            except Exception:
+                if time.monotonic() >= deadline:
+                    LOGGER.info("SteamVR runtime not reachable; quit watcher stopping.")
+                    return
+                time.sleep(2.0)
+
+        LOGGER.info("Watching SteamVR; will exit when it shuts down.")
+        event = openvr.VREvent_t()
+        try:
+            while True:
+                while vr_system.pollNextEvent(event):
+                    if event.eventType == openvr.VREvent_Quit:
+                        LOGGER.info("SteamVR is shutting down; exiting VRChat Clipper.")
+                        try:
+                            vr_system.acknowledgeQuit_Exiting()
+                        except Exception:
+                            pass
+                        try:
+                            openvr.shutdown()
+                        except Exception:
+                            pass
+                        on_quit()
+                        return
+                time.sleep(0.1)
+        except Exception as exc:
+            LOGGER.warning("SteamVR quit watcher error: %s", exc)
+        finally:
+            try:
+                openvr.shutdown()
+            except Exception:
+                pass
+
+    thread = threading.Thread(
+        target=_loop, name="vrchat-clipper-vr-watch", daemon=True
+    )
+    thread.start()
+    return thread
+
+
+def force_exit() -> None:
+    """Terminate the process immediately. Used as a last-resort quit callback."""
+
+    os._exit(0)
+
+
 def _server_url() -> str:
     cfg = load_config()
     server = cfg.get("server", {})
@@ -212,10 +290,13 @@ def run_with_tray() -> None:
     icon = _tray_icon()
     if icon is None:
         LOGGER.info("No tray available; running server in the foreground.")
-        # Keep the process alive on the server thread.
+        stop = threading.Event()
+        watch_for_steamvr_quit(on_quit=stop.set)
+        # Keep the process alive on the server thread until SteamVR quits.
         try:
-            threading.Event().wait()
+            stop.wait()
         except KeyboardInterrupt:
             pass
         return
+    watch_for_steamvr_quit(on_quit=icon.stop)
     icon.run()
