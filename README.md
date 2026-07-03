@@ -4,6 +4,8 @@ A small open-source tool for recording short VRChat clips on demand from a VR wr
 
 vrchat-clipper is built for quick 2 to 10 second social media clips: wave at a friend, deliver a birthday message, capture a small joke, then get a neat recording from OBS without taking off the headset or reaching for the keyboard.
 
+![The VRChat Clipper wrist panel in VRChat, showing the RECORD CLIP, START, and STOP buttons with a Ready status](docs/images/wrist-button-ingame.png)
+
 ## Features
 
 - VR wrist-button trigger through an OVR Toolkit Custom App.
@@ -54,126 +56,20 @@ intended runtime target is Windows with SteamVR.
 
 ## Installation
 
-There are two ways to install, and they behave identically once running. Pick one:
+There are two ways to install, and they behave identically once running. Pick the
+one that fits you — each guide is a complete, step-by-step walk-through:
 
-- **[Option A — Windows executable](#option-a--windows-executable-easiest)** —
-  no Python required, one file plus a config. Best for most users.
-- **[Option B — Python package](#option-b--python-package)** — install with `pip`,
-  or run from a source checkout. Best if you already use Python or want to modify
-  the code.
+- **[Windows executable](docs/install-windows-exe.md)** — download one file and
+  double-click it. No Python, no command line. Best for most people.
+- **[Python package](docs/install-python.md)** — install the wheel with `pip`, or
+  run from a source checkout. Best if you already use Python or want to modify the
+  code. This guide also covers building both release formats yourself.
 
-After installing, open <http://127.0.0.1:8765/> to configure clip timing, OBS,
-OSC, and an optional output folder, then do the shared
-[One-time VRChat and OBS setup](#one-time-vrchat-and-obs-setup).
-
-### Option A — Windows executable (easiest)
-
-1. Download `vrchat-clipper.exe` from the project's
-   [GitHub Releases](https://github.com/M1XZG/vrchat-clipper/releases), or build it
-   yourself (see [Building the releases](#building-the-releases)).
-2. Put it in a folder of your choice. Optionally copy `config.example.json` next
-   to it as `config.json` (the app also creates one when you save settings).
-3. Double-click `vrchat-clipper.exe`.
-
-It starts the local server, shows a **system-tray icon**, and — on first run, if
-SteamVR is present — registers itself with SteamVR for auto-launch. From the tray
-icon you can open the Web UI, trigger a clip, or quit.
-
-`config.json` lives **next to the executable** and stays plain, editable JSON.
-You can point the app at a different file with the `VRCHAT_CLIPPER_CONFIG`
-environment variable.
-
-### Option B — Python package
-
-Install the wheel from a release (or from a checkout) into any Python 3.10+
-environment:
-
-```powershell
-py -3 -m venv .venv
-.venv\Scripts\python -m pip install vrchat_clipper-<version>-py3-none-any.whl
-# Optional: tray icon + SteamVR auto-launch support
-.venv\Scripts\python -m pip install "vrchat-clipper[desktop] @ ."
-```
-
-This installs a `vrchat-clipper` command. Run it from the folder where you want
-`config.json` to live:
-
-```powershell
-copy config.example.json config.json
-vrchat-clipper
-```
-
-You can also run straight from a source checkout without installing:
-
-```powershell
-git clone https://github.com/M1XZG/vrchat-clipper.git
-cd vrchat-clipper
-py -3 -m venv .venv
-.venv\Scripts\python -m pip install -r requirements.txt
-copy config.example.json config.json
-.venv\Scripts\python -m vrchat_clipper
-```
-
-On Windows you can double-click `run.bat`; on Linux or macOS dev machines, run
-`./run.sh`.
-
-Useful command-line flags (both the exe and the `vrchat-clipper` command accept
-them):
-
-| Flag | Effect |
-|---|---|
-| `--no-tray` | Run a plain foreground server with no tray icon. |
-| `--tray` | Force the system-tray icon (default when running as the exe). |
-| `--register-vr` | Register with SteamVR for auto-launch, then exit. |
-| `--unregister-vr` | Remove the SteamVR auto-launch registration, then exit. |
-| `--no-vr-register` | Start normally but do not touch SteamVR registration. |
-
-> The tray icon and SteamVR registration need the optional `desktop` extras
-> (`pystray`, `Pillow`, `openvr`). The Windows executable already bundles them; for
-> the Python package install `vrchat-clipper[desktop]`. Without them the server
-> still runs headless.
-
-### What still needs separate setup
-
-Neither install format can contain these, so they are installed once (see
-[One-time VRChat and OBS setup](#one-time-vrchat-and-obs-setup)):
-
-- The **OVR Toolkit wrist button** (`vrchat_clipper/ovr-custom-app/`) runs inside OVR Toolkit, so
-  it is copied into OVR Toolkit's `LocalCustomApps` folder separately. See
-  [vrchat_clipper/ovr-custom-app/README.md](vrchat_clipper/ovr-custom-app/README.md).
-- **OBS Studio**, the **Off-World-Live obs-spout2-plugin**, and **VRChat's** camera
-  Stream mode / Spout toggle.
-
-### Launch with SteamVR
-
-Once registered (automatically on first run of the exe, or with `--register-vr`),
-the recorder appears under **SteamVR → Settings → Startup / Shutdown → Manage
-Add-Ons** and starts whenever SteamVR starts. Toggle it there, or run
-`--unregister-vr` to remove it.
-
-## Building the releases
-
-Both formats are built automatically by GitHub Actions when a version tag such as
-`v0.2.0` is pushed (`.github/workflows/release.yml`), and attached to a GitHub
-Release. To build them yourself:
-
-**Windows executable** — [PyInstaller](https://pyinstaller.org/) produces a binary
-for the platform it runs on, so a Windows `.exe` must be built on Windows:
-
-```powershell
-py -3 -m venv .venv
-.venv\Scripts\python -m pip install -r requirements.txt -r requirements-exe.txt
-.venv\Scripts\pyinstaller --clean --noconfirm vrchat-clipper.spec
-# -> dist\vrchat-clipper.exe
-```
-
-**Python wheel + sdist** — build on any platform:
-
-```sh
-python -m pip install --upgrade build
-python -m build            # -> dist/*.whl and dist/*.tar.gz
-```
-
+Either guide takes you through installing, first run, configuring, registering with
+SteamVR, and adding the wrist button, then hands off to the shared
+[One-time VRChat and OBS setup](#one-time-vrchat-and-obs-setup) below. Whichever you
+choose, you also need the apps the clipper drives — see
+[Requirements](#requirements).
 
 ## One-time VRChat and OBS setup
 
