@@ -1,0 +1,61 @@
+name: Setup / installation help
+description: You're stuck getting it installed or connected to OBS, VRChat, or OVR Toolkit.
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        There are a few moving parts to wire up (OBS, VRChat OSC, the Spout camera,
+        and the OVR Toolkit button). The
+        [one-time setup](https://github.com/M1XZG/vrchat-clipper/blob/main/docs/one-time-setup.md),
+        [OBS setup](https://github.com/M1XZG/vrchat-clipper/blob/main/docs/obs-setup.md),
+        and [troubleshooting](https://github.com/M1XZG/vrchat-clipper/blob/main/docs/troubleshooting.md)
+        guides cover most of it. If you're still stuck, tell us where.
+  - type: textarea
+    id: goal
+    attributes:
+      label: What are you trying to do, and where does it break down?
+      placeholder: The wrist button shows up but pressing it doesn't start a recording...
+    validations:
+      required: true
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: How did you install it?
+      options:
+        - Guided install (vrchat-clipper.exe install)
+        - Windows executable (manual)
+        - Python package (pip wheel)
+        - From source
+    validations:
+      required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Which step are you on?
+      options:
+        - Installing the clipper
+        - Setting up OBS (Spout2 source / WebSocket)
+        - Enabling the VRChat camera / OSC
+        - Adding the wrist button to OVR Toolkit
+        - It runs but recordings are wrong
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: tried
+    attributes:
+      label: What have you tried so far?
+    validations:
+      required: false
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      value: |
+        - Windows version:
+        - SteamVR version:
+        - OBS Studio version:
+        - OVR Toolkit version:
+    validations:
+      required: false

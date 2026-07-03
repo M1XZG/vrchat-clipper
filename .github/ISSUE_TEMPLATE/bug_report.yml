@@ -1,0 +1,93 @@
+name: Bug report
+description: Something isn't working the way it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. The more detail you give, the
+        quicker it can be tracked down. Please check the
+        [troubleshooting guide](https://github.com/M1XZG/vrchat-clipper/blob/main/docs/troubleshooting.md)
+        first — it covers the most common problems.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: A clear description of the problem, and what you expected instead.
+      placeholder: I pressed RECORD CLIP and nothing was recorded...
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How can someone else trigger the same problem?
+      placeholder: |
+        1. Start SteamVR and the clipper
+        2. Open OBS
+        3. Press the wrist button
+        4. ...
+    validations:
+      required: true
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: How did you install it?
+      options:
+        - Guided install (vrchat-clipper.exe install)
+        - Windows executable (manual)
+        - Python package (pip wheel)
+        - From source
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The release you're on (for example v0.3.0). The Web UI shows it, or check the release you downloaded.
+      placeholder: v0.3.0
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part is affected?
+      options:
+        - Wrist button (OVR Toolkit)
+        - Web UI / configuration
+        - OBS recording
+        - OSC countdown in VRChat
+        - SteamVR launch / auto-exit
+        - Installer (install / uninstall)
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Versions of the apps involved. Fill in what you know.
+      value: |
+        - Windows version:
+        - SteamVR version:
+        - OBS Studio version:
+        - OVR Toolkit version:
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or console output
+      description: Paste any error text from the clipper's console window or OBS. This is automatically formatted as code.
+      render: shell
+    validations:
+      required: false
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and didn't find a duplicate.
+          required: true
+        - label: I removed any passwords or private paths from logs and config I pasted.
+          required: true
