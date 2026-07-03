@@ -57,5 +57,5 @@ Start the clipper server first, then restart OVR Toolkit so it loads the tile.
 ## Next steps
 
 - Tune clip length, buffers, OBS, and OSC in the
-  [Configuration reference](../README.md#configuration-reference).
-- Hitting a snag? See [Troubleshooting](../README.md#troubleshooting).
+  [Configuration reference](configuration.md).
+- Hitting a snag? See [Troubleshooting](troubleshooting.md).

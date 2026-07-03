@@ -15,7 +15,6 @@ import argparse
 import sys
 
 from .config import load_config
-from .server import run
 
 
 def _is_frozen() -> bool:
@@ -23,6 +22,14 @@ def _is_frozen() -> bool:
 
 
 def main() -> None:
+    # Guided install / uninstall are dispatched before the server argument parser
+    # so a future GUI wrapper can call `vrchat-clipper install --silent ...`.
+    argv = sys.argv[1:]
+    if argv and argv[0] in {"install", "uninstall"}:
+        from . import installer
+
+        raise SystemExit(installer.main(argv))
+
     parser = argparse.ArgumentParser(description="Run the VRChat Clipper backend")
     tray_group = parser.add_mutually_exclusive_group()
     tray_group.add_argument(
@@ -96,6 +103,8 @@ def main() -> None:
                 desktop.watch_for_steamvr_quit(on_quit=desktop.force_exit)
             except Exception:
                 pass
+        from .server import run
+
         run()
 
 

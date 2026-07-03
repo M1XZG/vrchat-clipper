@@ -55,7 +55,7 @@ and newer, so there's nothing extra to install.
 
 Keep `config.json` out of version control — it holds your OBS password, and the repo
 already gitignores it. The matching settings are documented in the
-[Configuration reference](../README.md#configuration-reference).
+[Configuration reference](configuration.md).
 
 ## Check it works
 
@@ -72,4 +72,4 @@ With VRChat running (camera in Stream mode) and OBS open:
   OBS should switch to the `VRChat` scene and record a short file.
 
 If OBS won't connect or records a blank source, see
-[Troubleshooting](../README.md#troubleshooting).
+[Troubleshooting](troubleshooting.md).

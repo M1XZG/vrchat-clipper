@@ -80,7 +80,7 @@ Saving writes `config.json` in the current working directory. Keep that file out
 version control — it may hold your OBS password, and the repo already gitignores it.
 
 Every field is documented in the
-[Configuration reference](../README.md#configuration-reference).
+[Configuration reference](configuration.md).
 
 ## Register with SteamVR
 
@@ -158,6 +158,6 @@ py -3 -m venv .venv
 ## If something isn't working
 
 Common problems and fixes are in the
-[Troubleshooting section](../README.md#troubleshooting) — the Web UI being
+[Troubleshooting section](troubleshooting.md) — the Web UI being
 unreachable, the wrist tile not loading, OBS not connecting, and the countdown not
 showing up.

@@ -32,6 +32,9 @@ hidden_imports = (
         "httptools",
         "anyio",
         "anyio._backends._asyncio",
+        # Lazily imported inside functions, so ensure they are bundled.
+        "vrchat_clipper.desktop",
+        "vrchat_clipper.installer",
     ]
 )
 

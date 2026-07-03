@@ -1,11 +1,13 @@
 # Install with the Windows executable
 
-This is the easiest way to run vrchat-clipper. You download one file, double-click
-it, and the app takes care of the rest — no Python, no command line. If you just
-want the wrist button working, start here.
+This guide sets the single `.exe` up by hand — you place the file, create the config,
+and copy the wrist button into OVR Toolkit yourself. It's the most transparent path
+if you like to know where everything goes.
 
-> Prefer to install from `pip` or run from source? See the
-> [Python install guide](install-python.md) instead. Both give you the same app.
+> Want it done for you? The [guided install](install-guided.md) runs
+> `vrchat-clipper.exe install` and handles all of that in one step. Prefer `pip` or a
+> source checkout? See the [Python install guide](install-python.md). Every route
+> gives you the same app.
 
 ## Before you start
 
@@ -52,7 +54,7 @@ into. Saving writes `config.json` next to the executable, in plain readable JSON
 can also hand-edit later.
 
 Every setting is explained in the
-[Configuration reference](../README.md#configuration-reference).
+[Configuration reference](configuration.md).
 
 ## Step 4 — Let SteamVR launch it
 
@@ -108,6 +110,6 @@ environment variable if you don't want `config.json` beside the exe.
 ## If something isn't working
 
 Common problems and fixes are in the
-[Troubleshooting section](../README.md#troubleshooting) — the Web UI being
+[Troubleshooting section](troubleshooting.md) — the Web UI being
 unreachable, the wrist tile not loading, OBS not connecting, and the countdown not
 showing up.
