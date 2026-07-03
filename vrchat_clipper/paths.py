@@ -44,6 +44,20 @@ def web_dir() -> Path:
     return Path(__file__).resolve().parent / "web"
 
 
+def ovr_dir() -> Path:
+    """Directory holding the OVR Toolkit wrist-button app.
+
+    Served at ``/ovr`` for OVR Toolkit's Chromium custom-app browser. Like the
+    web UI it ships inside the package (``vrchat_clipper/ovr-custom-app``) so it
+    resolves from source, from a pip install, and when frozen. Frozen builds
+    place it at ``<bundle>/ovr-custom-app`` (see the PyInstaller spec).
+    """
+
+    if _frozen():
+        return _bundle_root() / "ovr-custom-app"
+    return Path(__file__).resolve().parent / "ovr-custom-app"
+
+
 def app_dir() -> Path:
     """Directory for user-editable state that persists between runs.
 

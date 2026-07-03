@@ -35,10 +35,13 @@ hidden_imports = (
     ]
 )
 
-# Bundle the web UI (now inside the package). Path is relative to this spec
-# file at build time; it is placed at <bundle>/web to match paths.web_dir().
+# Bundle the web UI and the OVR Toolkit wrist-button app (both now inside the
+# package). Paths are relative to this spec file at build time; they are placed
+# at <bundle>/web and <bundle>/ovr-custom-app to match paths.web_dir() and
+# paths.ovr_dir().
 datas = [
     ("vrchat_clipper/web", "web"),
+    ("vrchat_clipper/ovr-custom-app", "ovr-custom-app"),
 ]
 
 # openvr ships a native library (openvr_api.dll / .so / .dylib) plus data files

@@ -138,9 +138,9 @@ them):
 Neither install format can contain these, so they are installed once (see
 [One-time VRChat and OBS setup](#one-time-vrchat-and-obs-setup)):
 
-- The **OVR Toolkit wrist button** (`ovr-custom-app/`) runs inside OVR Toolkit, so
+- The **OVR Toolkit wrist button** (`vrchat_clipper/ovr-custom-app/`) runs inside OVR Toolkit, so
   it is copied into OVR Toolkit's `LocalCustomApps` folder separately. See
-  [ovr-custom-app/README.md](ovr-custom-app/README.md).
+  [vrchat_clipper/ovr-custom-app/README.md](vrchat_clipper/ovr-custom-app/README.md).
 - **OBS Studio**, the **Off-World-Live obs-spout2-plugin**, and **VRChat's** camera
   Stream mode / Spout toggle.
 
@@ -216,9 +216,9 @@ vrchat-clipper sends countdown messages to UDP port `9000` at OSC address `/chat
 
 ### 5. Install the OVR Toolkit Custom App
 
-The wrist button lives in `ovr-custom-app/`. Copy that folder into
+The wrist button lives in `vrchat_clipper/ovr-custom-app/`. Copy that folder into
 `%OVRToolkitInstallDir%/LocalCustomApps/VRChatClipper/` and follow
-[ovr-custom-app/README.md](ovr-custom-app/README.md).
+[vrchat_clipper/ovr-custom-app/README.md](vrchat_clipper/ovr-custom-app/README.md).
 
 OVR Toolkit custom apps only load `http(s)://` URLs (not local `file://` paths), so the
 button UI is served by the clipper server itself. The custom app's `entry.txt` points at:

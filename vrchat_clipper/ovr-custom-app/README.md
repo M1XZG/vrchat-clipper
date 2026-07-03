@@ -46,7 +46,8 @@ Attach To controller; the server must be running each session or the button show
 - `entry.txt` — the URL OVR Toolkit loads: `http://127.0.0.1:8765/ovr`. If you change
   the server host/port, update this to match.
 - `icon.png` — the tile icon.
-- `index.html` — the button UI. The server serves this file from the repo at `/ovr`.
+- `index.html` — the button UI. The server serves this file at `/ovr` (bundled
+  inside the package, so it works from source, a pip install, and the exe).
 - `permissions.json` — OVR Toolkit permissions. Not required for an `http://` entry,
   but harmless to leave in place.
 

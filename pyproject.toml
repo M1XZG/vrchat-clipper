@@ -50,5 +50,6 @@ packages = ["vrchat_clipper"]
 version = { attr = "vrchat_clipper.__version__" }
 
 [tool.setuptools.package-data]
-# Ship the web UI inside the wheel so it is found when pip-installed.
-vrchat_clipper = ["web/*"]
+# Ship the web UI and the OVR Toolkit wrist-button app inside the wheel so both
+# are found when pip-installed (served at / and /ovr respectively).
+vrchat_clipper = ["web/*", "ovr-custom-app/*"]

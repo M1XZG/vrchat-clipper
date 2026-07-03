@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from . import __version__
 from .clipper import Clipper
 from .config import load_config, merge_config, save_config
-from .paths import web_dir
+from .paths import ovr_dir, web_dir
 
 _CLIPPER = Clipper(config_getter=load_config)
 
@@ -56,8 +56,9 @@ def create_app() -> FastAPI:
     async def ovr_app() -> FileResponse | HTMLResponse:
         # OVR Toolkit custom apps only load http(s) URLs (file:// is unsupported),
         # so the wrist button UI is served here. Point the custom app's entry.txt
-        # at http://127.0.0.1:8765/ovr.
-        ovr_index = Path(__file__).resolve().parents[1] / "ovr-custom-app" / "index.html"
+        # at http://127.0.0.1:8765/ovr. The app ships inside the package so this
+        # resolves from source, a pip install, and the frozen exe alike.
+        ovr_index = ovr_dir() / "index.html"
         if ovr_index.exists():
             return FileResponse(ovr_index)
         return HTMLResponse(
