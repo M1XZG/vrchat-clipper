@@ -6,6 +6,29 @@ vrchat-clipper is built for quick 2 to 10 second social media clips: wave at a f
 
 ![The VRChat Clipper wrist panel in VRChat, showing the RECORD CLIP, START, and STOP buttons with a Ready status](docs/images/wrist-button-ingame.png)
 
+## Contents
+
+- [Features](#features)
+- [Architecture](#architecture)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [One-time VRChat and OBS setup](#one-time-vrchat-and-obs-setup)
+- [Configuration reference](#configuration-reference)
+- [Timing model](#timing-model)
+- [How it works](#how-it-works)
+- [Troubleshooting](#troubleshooting)
+- [Acknowledgements and prior art](#acknowledgements-and-prior-art)
+- [Licence](#licence)
+- [Disclaimer](#disclaimer)
+
+### Separate guides
+
+- [Install with the Windows executable](docs/install-windows-exe.md)
+- [Install with Python (pip or source)](docs/install-python.md)
+- [OBS setup](docs/obs-setup.md)
+- [OVR Toolkit wrist-button app](vrchat_clipper/ovr-custom-app/README.md)
+- [Design notes and research](docs/DESIGN.md)
+
 ## Features
 
 - VR wrist-button trigger through an OVR Toolkit Custom App.
@@ -86,31 +109,21 @@ In short:
 3. Enable Stream mode and Spout2 output.
 4. Leave VRChat running. The Spout sender should remain available even if the camera UI is closed.
 
-### 2. Install and configure OBS Spout2 capture
+### 2. Set up OBS
 
-1. Install the Off-World-Live obs-spout2-plugin.
-2. In OBS, create or open a scene named `VRChat`.
-3. Add a Spout2 Capture source.
-4. Set the source sender to `VRCSender1`.
-5. Confirm that the VRChat camera feed appears in OBS.
+The clipper captures VRChat's camera through an OBS Spout2 source and controls
+recording over the OBS WebSocket. Both are configured once, in the
+**[OBS setup guide](docs/obs-setup.md)**: install the Off-World-Live Spout2 plugin,
+add a `Spout2 Capture` source bound to `VRCSender1`, and enable the OBS WebSocket
+server with a password you put in `config.json`.
 
-### 3. Enable OBS WebSocket
-
-OBS 28 and newer includes obs-websocket v5, no separate install is needed.
-
-1. In OBS, open **Tools > WebSocket Server Settings**.
-2. Enable the WebSocket server.
-3. Keep the default port `4455`, unless you also change `obs.port` in `config.json`.
-4. Set a password.
-5. Put that password in your local `config.json`. Do not commit `config.json`.
-
-### 4. Enable VRChat OSC
+### 3. Enable VRChat OSC
 
 In VRChat, open **Action Menu > OSC > Enabled**.
 
 vrchat-clipper sends countdown messages to UDP port `9000` at OSC address `/chatbox/input` with arguments: message text, bypass keyboard, suppress sound effect.
 
-### 5. Install the OVR Toolkit Custom App
+### 4. Install the OVR Toolkit Custom App
 
 The wrist button lives in `vrchat_clipper/ovr-custom-app/`. Copy that folder into
 `%OVRToolkitInstallDir%/LocalCustomApps/VRChatClipper/` and follow

@@ -72,7 +72,7 @@ The in-VR button is an OVR Toolkit custom app. Copy the
 OVR Toolkit's `LocalCustomApps` folder and follow
 [its README](../vrchat_clipper/ovr-custom-app/README.md). The full walk-through,
 including pinning the tile to your wrist, is in
-[Install the OVR Toolkit Custom App](../README.md#5-install-the-ovr-toolkit-custom-app).
+[Install the OVR Toolkit Custom App](../README.md#4-install-the-ovr-toolkit-custom-app).
 
 Once it's pinned, glancing at your wrist in VRChat shows the panel:
 

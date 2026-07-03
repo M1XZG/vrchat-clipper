@@ -117,7 +117,7 @@ The in-VR button is an OVR Toolkit custom app. Copy the
 [`vrchat_clipper/ovr-custom-app/`](../vrchat_clipper/ovr-custom-app/) folder into
 OVR Toolkit's `LocalCustomApps` folder and follow
 [its README](../vrchat_clipper/ovr-custom-app/README.md); the full walk-through is in
-[Install the OVR Toolkit Custom App](../README.md#5-install-the-ovr-toolkit-custom-app).
+[Install the OVR Toolkit Custom App](../README.md#4-install-the-ovr-toolkit-custom-app).
 
 Once pinned, glancing at your wrist in VRChat shows the panel:
 
