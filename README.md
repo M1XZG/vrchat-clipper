@@ -61,6 +61,13 @@ The Windows executable needs nothing else. The Python package also needs **Pytho
 - [obsws-python](https://github.com/aatikturk/obsws-python) — OBS WebSocket v5 control.
 - [Off-World-Live obs-spout2-plugin](https://github.com/Off-World-Live/obs-spout2-plugin) — captures VRChat's Spout2 output in OBS.
 
+## Contributing
+
+Bug reports, feature ideas, and pull requests are welcome. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for how to get set up and send a change, and
+[SECURITY.md](SECURITY.md) for reporting security issues privately. `main` is
+protected, so changes land through reviewed pull requests.
+
 ## Licence
 
 MIT, see [LICENSE](LICENSE).
