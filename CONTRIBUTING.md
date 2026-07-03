@@ -63,4 +63,9 @@ use the body to explain the why when it isn't obvious from the change itself.
 By contributing, you agree that your work is licensed under the project's
 [MIT licence](LICENSE).
 
+## Code of conduct
+
+This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). By taking part
+you agree to abide by it.
+
 That's it. Be kind, keep it reasonable, and thanks for pitching in.
